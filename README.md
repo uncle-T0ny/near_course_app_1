@@ -44,3 +44,5 @@ near view dev-1634754709855-35625310829537  get_donations
 
 near call dev-1634754709855-35625310829537 donate '{"receiver": "some1.testnet"}' --accountId donation.testnet --amount 5
 ```
+
+near call dev-1634754709855-35625310829537  add_donation '{"amount": 15, "receiver": "aromankov.testnet"}' --accountId donation.testnet
