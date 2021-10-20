@@ -14,54 +14,71 @@
       <div><a href="contract.html">contract</a></div>
     </nav>
     <hr />
+    <button id="test">Test</button>
+    <input type="text" id="read-test" placeholder="test" />
+
     <button id="hello">helloWorld</button>
     <br />
-    <button id="read">read</button> <input type="text" id="read-key" placeholder="key" />
+    <button id="read">read</button>
+    <input type="text" id="read-key" placeholder="key" />
     <br />
-    <button id="write">write</button> <input type="text" id="write-key" placeholder="key" /> <input type="text" id="write-value" placeholder="value" />
+    <button id="write">write</button>
+    <input type="text" id="write-key" placeholder="key" />
+    <input type="text" id="write-value" placeholder="value" />
 
     <script>
       (async () => {
         const { connect, keyStores, WalletConnection, Contract } = nearApi;
 
-        const CONTRACT_ID = 'dev-1634743304430-30683145527708';
+        const CONTRACT_ID = "dev-1634743304430-30683145527708";
 
         const near = await connect(config());
-        const wallet = new WalletConnection(near, 'ncd-ii');
+        const wallet = new WalletConnection(near, "ncd-ii");
 
         const dom = setupDOMBindings();
 
         const contract = new Contract(wallet.account(), CONTRACT_ID, {
-          viewMethods: ['helloWorld', 'read'],
-          changeMethods: ['write'],
-          sender: wallet.account()
+          viewMethods: ["helloWorld", "read"],
+          changeMethods: ["write"],
+          sender: wallet.account(),
         });
 
         if (wallet.isSignedIn()) {
-          dom.btnHello.addEventListener('click', async () => console.log(await contract.helloWorld()));
-          dom.btnRead.addEventListener('click', async () => console.log(await contract.read({ key: dom.txtReadKey.value })));
-          dom.btnWrite.addEventListener('click', async () => console.log(await contract.write({ key: dom.txtWriteKey.value, value: dom.txtWriteValue.value })));
+          dom.btnHello.addEventListener("click", async () =>
+            console.log(await contract.helloWorld())
+          );
+          dom.btnRead.addEventListener("click", async () =>
+            console.log(await contract.read({ key: dom.txtReadKey.value }))
+          );
+          dom.btnWrite.addEventListener("click", async () =>
+            console.log(
+              await contract.write({
+                key: dom.txtWriteKey.value,
+                value: dom.txtWriteValue.value,
+              })
+            )
+          );
         }
 
         function config() {
           return {
-            networkId: 'testnet',
+            networkId: "testnet",
             keyStore: new keyStores.BrowserLocalStorageKeyStore(),
-            nodeUrl: 'https://rpc.testnet.near.org',
-            walletUrl: 'https://wallet.testnet.near.org',
-            helperUrl: 'https://helper.testnet.near.org',
-            explorerUrl: 'https://explorer.testnet.near.org'
+            nodeUrl: "https://rpc.testnet.near.org",
+            walletUrl: "https://wallet.testnet.near.org",
+            helperUrl: "https://helper.testnet.near.org",
+            explorerUrl: "https://explorer.testnet.near.org",
           };
         }
 
         function setupDOMBindings() {
           return {
-            btnHello: document.querySelector('#hello'),
-            btnRead: document.querySelector('#read'),
-            txtReadKey: document.querySelector('#read-key'),
-            btnWrite: document.querySelector('#write'),
-            txtWriteKey: document.querySelector('#write-key'),
-            txtWriteValue: document.querySelector('#write-value')
+            btnHello: document.querySelector("#hello"),
+            btnRead: document.querySelector("#read"),
+            txtReadKey: document.querySelector("#read-key"),
+            btnWrite: document.querySelector("#write"),
+            txtWriteKey: document.querySelector("#write-key"),
+            txtWriteValue: document.querySelector("#write-value"),
           };
         }
       })();
