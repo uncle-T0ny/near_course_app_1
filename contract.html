@@ -14,51 +14,102 @@
       <div><a href="contract.html">contract</a></div>
     </nav>
     <hr />
-    <button id="test">Test</button>
-    <input type="text" id="read-test" placeholder="test" />
+    <div style="margin: 40px"></div>
 
-    <button id="hello">helloWorld</button>
-    <br />
-    <button id="read">read</button>
-    <input type="text" id="read-key" placeholder="key" />
-    <br />
-    <button id="write">write</button>
-    <input type="text" id="write-key" placeholder="key" />
-    <input type="text" id="write-value" placeholder="value" />
+
+      <button id="donate">Donate</button>
+      <select id="recivier" value="some1.testnet">
+        <option value="some1.testnet">some1.testnet</option>
+        <option value="mark.testnet">mark.testnet</option>
+        <option value="karl.testnet">karl.testnet</option>
+        <option value="donation.testnet">donation.testnet</option>
+      </select>
+
+      <input
+        type="number"
+        id="read-donate"
+        placeholder="input value of donation"
+      />
+      <p>
+       Reciviers:
+      </p>
+      <ul id="donation-list-amoun">
+
+      </ul>
+    </div>
 
     <script>
       (async () => {
         const { connect, keyStores, WalletConnection, Contract } = nearApi;
+        const {utils} = nearApi;
+       
 
-        const CONTRACT_ID = "dev-1634743304430-30683145527708";
+        // const CONTRACT_ID = "dev-1634750735525-25016641485549";
+        const CONTRACT_ID = "dev-1634754709855-35625310829537";
 
         const near = await connect(config());
         const wallet = new WalletConnection(near, "ncd-ii");
 
         const dom = setupDOMBindings();
+        const accountId = wallet.account().accountId;
 
         const contract = new Contract(wallet.account(), CONTRACT_ID, {
-          viewMethods: ["helloWorld", "read"],
-          changeMethods: ["write"],
+          viewMethods: ["helloWorld", "get_donations"],
+          changeMethods: ["donate"],
           sender: wallet.account(),
         });
+        console.log("conract", contract);
+
+        dom.inputDonate100.addEventListener("input", (e) => {
+          e.target.value = Math.abs(e.target.value);
+        }); 
+
+        document.addEventListener("DOMContentLoaded",  async (e)=>{
+          console.log("LOAD")
+          const result = await contract.get_donations();
+          console.log("result", result);
+          dom.listDonate100.innerHTML = result.map(item => `<li> 
+            <p>amount: ${utils.format.formatNearAmount(item.amount)}</p>
+            <p>donate: ${utils.format.formatNearAmount(item.donated)}</p>
+            <p>recivier: ${item.receiver}<p></li>`).join("");
+              
+
+        })
+
 
         if (wallet.isSignedIn()) {
-          dom.btnHello.addEventListener("click", async () =>
-            console.log(await contract.helloWorld())
-          );
-          dom.btnRead.addEventListener("click", async () =>
-            console.log(await contract.read({ key: dom.txtReadKey.value }))
-          );
-          dom.btnWrite.addEventListener("click", async () =>
-            console.log(
-              await contract.write({
-                key: dom.txtWriteKey.value,
-                value: dom.txtWriteValue.value,
-              })
-            )
-          );
+          dom.btnDonate100.addEventListener("click", async () => {
+            const donated = +dom.inputDonate100.value;
+            const receiver = dom.selectRecivier.value;
+            if(!donated) {
+              console.log("Enter donated value")
+              return}
+
+            const result = await contract.donate({
+              receiver: receiver,
+              accountId: wallet.account().accountId,
+              amount:"2" 
+            });
+
+            console.log("click", receiver, donated);
+      
+          });
+
+
+
+          // dom.btnRead.addEventListener("click", async () =>
+          //   console.log(await contract.read({ key: dom.txtReadKey.value }))
+          // );
+          // dom.btnWrite.addEventListener("click", async () =>
+          //   console.log(
+          //     await contract.write({
+          //       key: dom.txtWriteKey.value,
+          //       value: dom.txtWriteValue.value,
+          //     })
+          //   )
+          // );
         }
+
 
         function config() {
           return {
@@ -73,12 +124,11 @@
 
         function setupDOMBindings() {
           return {
-            btnHello: document.querySelector("#hello"),
-            btnRead: document.querySelector("#read"),
-            txtReadKey: document.querySelector("#read-key"),
-            btnWrite: document.querySelector("#write"),
-            txtWriteKey: document.querySelector("#write-key"),
-            txtWriteValue: document.querySelector("#write-value"),
+            btnDonate100: document.querySelector("#donate"),
+            inputDonate100: document.querySelector("#read-donate"),
+            selectRecivier: document.querySelector("#recivier"),
+            txtCollected100: document.querySelector("#collected"),
+            listDonate100: document.querySelector("#donation-list-amoun"),
           };
         }
       })();
